@@ -15,7 +15,7 @@ from tkinter import *
 
 COORD_MAX = 700
 
-
+"Hej!"
 
 initial = [(30,40), (30,30), (30,20)]
 
