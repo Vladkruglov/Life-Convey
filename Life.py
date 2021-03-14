@@ -10,14 +10,17 @@
 Тебе понравится!"""
 import time
 import doctest
-from tkinter import *
+import tkinter
+import pdb
 
 
-COORD_MAX = 700
+COORD_MAX_X = 700
+COORD_MAX_Y = 700
+NUM_OF_CELLS_IN_A_ROW = 70
+SIZE_OF_THE_CELL_X = int(COORD_MAX_X / NUM_OF_CELLS_IN_A_ROW)
+SIZE_OF_THE_CELL_Y = int(COORD_MAX_Y / NUM_OF_CELLS_IN_A_ROW)
 
-"Hej!"
-
-initial = [(30,40), (30,30), (30,20)]
+initial = [(35,45), (35,35), (35,25)]
 
 def is_alive(y, x, generation):
     """Принимает местоположение клетки(x, y), и список всех генераций
@@ -76,20 +79,20 @@ def more_than_max(y, x, generation):
     Принимает местоположение клетки(x, y), и список всех генераций
     Проводит местоположение по габаритам
     Выводит усовершенствованные параметры
-    >>> more_than_max(-1, 1000001,[(3, 2), (3, 3), (3, 4)])
-    (999999, 1)
+    >>> more_than_max(-1, 701,[(3, 2), (3, 3), (3, 4)])
+    (699, 1)
     """
     
         
-    if x < 0 or y < 0 or x > COORD_MAX or y > COORD_MAX:
+    if x < 0 or y < 0 or x > COORD_MAX_X or y > COORD_MAX_Y:
         if x < 0:
-            x = COORD_MAX + x 
+            x = COORD_MAX_X + x 
         if y < 0:
-            y = COORD_MAX + y 
-        if x > COORD_MAX:
-            x = x - COORD_MAX
-        if y > COORD_MAX:
-            y = y - COORD_MAX
+            y = COORD_MAX_Y + y 
+        if x > COORD_MAX_X:
+            x = x - COORD_MAX_X
+        if y > COORD_MAX_Y:
+            y = y - COORD_MAX_Y
     return y, x
 
 def calc_generation(generation):
@@ -128,18 +131,31 @@ def check(spisok: list):
 def field(generation):
     """Принимает список всех генераций
     Создаёт поле для игры"""
-    t = Tk()
-    c = Canvas(t,height = 700,width = 700)
+    t = tkinter.Tk()
+    c = tkinter.Canvas(t,height = COORD_MAX_Y,width = COORD_MAX_X)
     c.pack()
-    a = 0
     generation = list(generation)
-    NUM_OF_CELLS_IN_A_ROW = 70
-    while a != 700:                  
-        c.create_line(a, 700, a, 0, fill = "grey")
-        c.create_line(700, a, 0, a,  fill = "grey")
-        a = a + 10
+    for i in range(0, COORD_MAX_Y, SIZE_OF_THE_CELL_Y):
+        time.sleep(0.05)
+        c.create_line(i, COORD_MAX_X, i, 0, fill = "grey")
+        c.update()
+        c.update_idletasks()
+
+    for i in range(0, COORD_MAX_X, SIZE_OF_THE_CELL_X):
+        time.sleep(0.05)
+        c.create_line(COORD_MAX_Y, i, 0,  i, fill = "grey") 
+        c.update()
+        c.update_idletasks()
+
+    for (y, x) in generation:
+        pdb.set_trace()
+        c.create_rectangle(y+5, y-5, x+5, x-5, fill = "black")
+        c.update()
+        c.update_idletasks()
+        time.sleep(1)
 
     t.mainloop()
+
 
 
 def main():
@@ -156,5 +172,5 @@ def main():
         
 
 if __name__ == "__main__":
-    # doctest.testmod()
+    doctest.testmod()
     field(initial)
