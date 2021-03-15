@@ -20,7 +20,7 @@ NUM_OF_CELLS_IN_A_ROW = 70
 SIZE_OF_THE_CELL_X = int(COORD_MAX_X / NUM_OF_CELLS_IN_A_ROW)
 SIZE_OF_THE_CELL_Y = int(COORD_MAX_Y / NUM_OF_CELLS_IN_A_ROW)
 
-initial = [(35,45), (35,35), (35,25)]
+initial = [(35,34), (35,35), (35,36)]
 
 def is_alive(y, x, generation):
     """Принимает местоположение клетки(x, y), и список всех генераций
@@ -109,8 +109,8 @@ def calc_generation(generation):
             new_generation.append((y,x))
             new_generation.append(find_new_life(y, x, generation))
         
-    if check(new_generation):
-        return new_generation
+    
+    return new_generation
 
 def check(spisok: list):
     """
@@ -127,7 +127,6 @@ def check(spisok: list):
         return False
     else:
         return True
-
 def field(generation):
     """Принимает список всех генераций
     Создаёт поле для игры"""
@@ -136,23 +135,25 @@ def field(generation):
     c.pack()
     generation = list(generation)
     for i in range(0, COORD_MAX_Y, SIZE_OF_THE_CELL_Y):
-        time.sleep(0.05)
         c.create_line(i, COORD_MAX_X, i, 0, fill = "grey")
         c.update()
         c.update_idletasks()
 
     for i in range(0, COORD_MAX_X, SIZE_OF_THE_CELL_X):
-        time.sleep(0.05)
         c.create_line(COORD_MAX_Y, i, 0,  i, fill = "grey") 
         c.update()
         c.update_idletasks()
 
     for (y, x) in generation:
         pdb.set_trace()
-        c.create_rectangle(y+5, y-5, x+5, x-5, fill = "black")
+        y = int(y)
+        x = int(x)
+        c.create_rectangle(x * SIZE_OF_THE_CELL_X, y * SIZE_OF_THE_CELL_Y,
+          x * SIZE_OF_THE_CELL_X + SIZE_OF_THE_CELL_X, y * SIZE_OF_THE_CELL_Y + SIZE_OF_THE_CELL_Y,  fill = "black")
         c.update()
         c.update_idletasks()
-        time.sleep(1)
+    time.sleep(5)
+    c.destroy()
 
     t.mainloop()
 
@@ -163,14 +164,13 @@ def main():
     generatios = []
     state = initial
     generatios.append(tuple(state))
-    while len(state) > 0 and check(generatios):
+    while len(state) > 0:
         state = calc_generation(state)
         time.sleep(0.5)
-        print("Alive: {}".format(len(state)))
-        print(state)
+        field(state)
         generatios.append(tuple(state))
         
 
 if __name__ == "__main__":
     doctest.testmod()
-    field(initial)
+    main()
