@@ -12,10 +12,23 @@ import time
 import doctest
 
 from representation import field
-from constants import COORD_MAX_X, COORD_MAX_Y, SIZE_OF_THE_CELL_X, SIZE_OF_THE_CELL_Y
+from constants import COORD_MAX_X, COORD_MAX_Y, SIZE_OF_THE_CELL_X, SIZE_OF_THE_CELL_Y, NUM_OF_CELLS_IN_A_ROW
 
 initial = [(35,34), (35,35), (35,36), (36,36), (37,35)]
 # initial = [(35,35), (35,36), (36,36)]
+
+def boundaries(a):
+    (x,y) = a
+    if x < 0:
+        x = NUM_OF_CELLS_IN_A_ROW + x +1
+    if y < 0:
+        y = NUM_OF_CELLS_IN_A_ROW + y +1
+    if x > NUM_OF_CELLS_IN_A_ROW:
+        x = x - NUM_OF_CELLS_IN_A_ROW
+    if y > NUM_OF_CELLS_IN_A_ROW:
+        y = y - NUM_OF_CELLS_IN_A_ROW
+
+    return (x, y)
 
 def is_alive(x, y, generation):
     """Принимает местоположение клетки(x, y), и список всех генераций
@@ -37,9 +50,10 @@ def calc_neighbours(x, y, generation):
     alive_neighbours = 0
     for i in range(-1, 2):
         for j in range(-1, 2):
+            (nx, ny) = boundaries((x+i, y+j))
             if i==0 and j==0:
                 continue
-            elif is_alive(x+i, y+j, generation):
+            elif is_alive(nx, ny, generation):
                 alive_neighbours +=1
     return alive_neighbours
         
@@ -60,9 +74,10 @@ def find_new_life(x, y, generation):
     newborn_cells = []
     for i in range(-1, 2):
         for j in range(-1, 2):
+            (nx, ny) = boundaries((x+i, y+j))
             if i==0 and j==0:
                 continue
-            elif is_born(x+i, y+j, generation):
+            elif is_born(nx, ny, generation):
                 newborn_cells.append((x+i, y+j))
     return newborn_cells
 
@@ -83,22 +98,6 @@ def calc_generation(generation):
 
     return list(set(new_generation))
 
-def check(spisok: list):
-    """
-    Принимает список поколений с дубликатами/без дубликатов
-    Выводит есть ли там дубликаты, или нет
-    #>>> check([(3, 2), (3, 2)])
-    False
-    #>>> check([(3, 2), (3, 3)])
-    True
-    """
-    spisok = spisok.reverse
-    if spisok[0] == spisok[1]:
-        spisok = spisok.reverse
-        return False
-    else:
-        return True
-
 def main():
     """Основная функция"""
     generations = []
@@ -106,8 +105,7 @@ def main():
     generations.append(tuple(state))
     field(state)
     while len(state) > 0:
-        state = generations[-1]
-        state = calc_generation(state)
+        state = list(map(boundaries, calc_generation(generations[-1])))
         field(state)
         generations.append(tuple(state))
 
