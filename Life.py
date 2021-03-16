@@ -14,20 +14,19 @@ import doctest
 from representation import field
 from constants import COORD_MAX_X, COORD_MAX_Y, SIZE_OF_THE_CELL_X, SIZE_OF_THE_CELL_Y
 
-initial = [(35,34), (35,35), (35,36), (36,36)]
+initial = [(35,34), (35,35), (35,36), (36,36), (37,35)]
 
-def is_alive(y, x, generation):
+def is_alive(x, y, generation):
     """Принимает местоположение клетки(x, y), и список всех генераций
     Выводит жива она, или нет"""
     try:
-        more_than_max(y, x, generation)
-        generation.index((y, x))
+        generation.index((x, y))
         return True
     except ValueError:
         return False
     return False
 
-def calc_neighbours(y, x, generation):
+def calc_neighbours(x, y, generation):
     """
     Принимает местоположение клетки(x, y), и список всех генераций
     Выводит количество соседей
@@ -39,18 +38,18 @@ def calc_neighbours(y, x, generation):
         for j in range(-1, 2):
             if i==0 and j==0:
                 continue
-            if is_alive(y+i, x+j, generation):     
+            if is_alive(x+i, y+j, generation):
                 alive_neighbours +=1
     return alive_neighbours
         
-def is_born(y, x, generation):
+def is_born(x, y, generation):
     """Принимает местоположение клетки(x, y), и список всех генераций
     Выводит жива она или нет"""
-    neighbours = calc_neighbours(y, x, generation)
+    neighbours = calc_neighbours(x, y, generation)
     if neighbours == 3:
         return True
 
-def find_new_life(y,x, generation):
+def find_new_life(x, y, generation):
     """
     Принимает местоположение клетки(x, y), и список всех генераций
     Выводит список всех новорождённых клеток
@@ -58,13 +57,13 @@ def find_new_life(y,x, generation):
     [(2, 3), (4, 3)]
     """
     newborn_cells = []
-    for i in range(-1, 2):
-        for j in range(-1, 2):
-            if is_born(y+i, x+j, generation):
+    for i in range(-1, 1):
+        for j in range(-1, 1):
+            if is_born(x+i, y+j, generation):
                 newborn_cells.append((y+i, x+j))
     return newborn_cells
 
-def more_than_max(y, x, generation):
+def more_than_max(x, y, generation):
     """
     Принимает местоположение клетки(x, y), и список всех генераций
     Проводит местоположение по габаритам
@@ -72,8 +71,7 @@ def more_than_max(y, x, generation):
     >>> more_than_max(-1, 701,[(3, 2), (3, 3), (3, 4)])
     (699, 1)
     """
-    
-        
+
     if x < 0 or y < 0 or x > COORD_MAX_X or y > COORD_MAX_Y:
         if x < 0:
             x = COORD_MAX_X + x 
@@ -92,7 +90,7 @@ def calc_generation(generation):
     [(2, 3), (3, 3), (4, 3)]
     """
     new_generation = []
-    for (y, x) in generation:
+    for (x, y) in generation:
         non = calc_neighbours(x, y, generation)
         
         if non >= 2 and non <= 3:
@@ -120,18 +118,16 @@ def check(spisok: list):
 
 def main():
     """Основная функция"""
-    generatios = []
+    generations = []
     state = initial
-    generatios.append(tuple(state))
+    generations.append(tuple(state))
+    field(state)
+    time.sleep(2)
     while len(state) > 0:
-        state = generatios[-1]
+        state = generations[-1]
         state = calc_generation(state)
         field(state)
-        time.sleep(0.5)
-        generatios.append(tuple(state))
-
-        print(generatios)
-        
+        generations.append(tuple(state))
 
 if __name__ == "__main__":
     # doctest.testmod()
