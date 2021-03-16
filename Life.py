@@ -69,7 +69,7 @@ def find_new_life(y,x, generation):
         for j in range(-1, 2):
             if is_born(y+i, x+j, generation):
                 newborn_cells.append((y+i, x+j))
-    
+    print(newborn_cells)
     return newborn_cells
 
     
@@ -107,7 +107,9 @@ def calc_generation(generation):
         if non >= 2 and non <= 3:
             more_than_max(y, x, generation)
             new_generation.append((y,x))
+            print(list(new_generation))
             new_generation.append(find_new_life(y, x, generation))
+            print(list(new_generation))
         
     
     return new_generation
@@ -145,15 +147,12 @@ def field(generation):
         c.update_idletasks()
 
     for (y, x) in generation:
-        pdb.set_trace()
-        y = int(y)
-        x = int(x)
         c.create_rectangle(x * SIZE_OF_THE_CELL_X, y * SIZE_OF_THE_CELL_Y,
           x * SIZE_OF_THE_CELL_X + SIZE_OF_THE_CELL_X, y * SIZE_OF_THE_CELL_Y + SIZE_OF_THE_CELL_Y,  fill = "black")
         c.update()
         c.update_idletasks()
     time.sleep(5)
-    c.destroy()
+    c.clipboard_clear()
 
     t.mainloop()
 
