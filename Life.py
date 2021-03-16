@@ -15,6 +15,7 @@ from representation import field
 from constants import COORD_MAX_X, COORD_MAX_Y, SIZE_OF_THE_CELL_X, SIZE_OF_THE_CELL_Y
 
 initial = [(35,34), (35,35), (35,36), (36,36), (37,35)]
+# initial = [(35,35), (35,36), (36,36)]
 
 def is_alive(x, y, generation):
     """Принимает местоположение клетки(x, y), и список всех генераций
@@ -38,7 +39,7 @@ def calc_neighbours(x, y, generation):
         for j in range(-1, 2):
             if i==0 and j==0:
                 continue
-            if is_alive(x+i, y+j, generation):
+            elif is_alive(x+i, y+j, generation):
                 alive_neighbours +=1
     return alive_neighbours
         
@@ -57,10 +58,12 @@ def find_new_life(x, y, generation):
     [(2, 3), (4, 3)]
     """
     newborn_cells = []
-    for i in range(-1, 1):
-        for j in range(-1, 1):
-            if is_born(x+i, y+j, generation):
-                newborn_cells.append((y+i, x+j))
+    for i in range(-1, 2):
+        for j in range(-1, 2):
+            if i==0 and j==0:
+                continue
+            elif is_born(x+i, y+j, generation):
+                newborn_cells.append((x+i, y+j))
     return newborn_cells
 
 def more_than_max(x, y, generation):
@@ -84,20 +87,20 @@ def more_than_max(x, y, generation):
     return y, x
 
 def calc_generation(generation):
-    """Принимает список всех генераций
-    Выводит новые генерации
+    """Принимает поколение в виде списка кортежей (точек) Выводит новые генерации
+
     >>> calc_generation([(3, 2), (3, 3), (3, 4)])
     [(2, 3), (3, 3), (4, 3)]
+
     """
     new_generation = []
     for (x, y) in generation:
         non = calc_neighbours(x, y, generation)
-        
+
         if non >= 2 and non <= 3:
             new_generation.append((x, y))
+        new_generation.extend(find_new_life(x, y, generation))
 
-        new_generation.extend(find_new_life(x, y, generation))        
-    
     return list(set(new_generation))
 
 def check(spisok: list):
@@ -122,7 +125,6 @@ def main():
     state = initial
     generations.append(tuple(state))
     field(state)
-    time.sleep(2)
     while len(state) > 0:
         state = generations[-1]
         state = calc_generation(state)
