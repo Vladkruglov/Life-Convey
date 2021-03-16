@@ -66,26 +66,6 @@ def find_new_life(x, y, generation):
                 newborn_cells.append((x+i, y+j))
     return newborn_cells
 
-def more_than_max(x, y, generation):
-    """
-    Принимает местоположение клетки(x, y), и список всех генераций
-    Проводит местоположение по габаритам
-    Выводит усовершенствованные параметры
-    >>> more_than_max(-1, 701,[(3, 2), (3, 3), (3, 4)])
-    (699, 1)
-    """
-
-    if x < 0 or y < 0 or x > COORD_MAX_X or y > COORD_MAX_Y:
-        if x < 0:
-            x = COORD_MAX_X + x 
-        if y < 0:
-            y = COORD_MAX_Y + y 
-        if x > COORD_MAX_X:
-            x = x - COORD_MAX_X
-        if y > COORD_MAX_Y:
-            y = y - COORD_MAX_Y
-    return y, x
-
 def calc_generation(generation):
     """Принимает поколение в виде списка кортежей (точек) Выводит новые генерации
 
