@@ -10,17 +10,11 @@
 Тебе понравится!"""
 import time
 import doctest
-import tkinter
-import pdb
 
+from representation import field
+from constants import COORD_MAX_X, COORD_MAX_Y, SIZE_OF_THE_CELL_X, SIZE_OF_THE_CELL_Y
 
-COORD_MAX_X = 700
-COORD_MAX_Y = 700
-NUM_OF_CELLS_IN_A_ROW = 70
-SIZE_OF_THE_CELL_X = int(COORD_MAX_X / NUM_OF_CELLS_IN_A_ROW)
-SIZE_OF_THE_CELL_Y = int(COORD_MAX_Y / NUM_OF_CELLS_IN_A_ROW)
-
-initial = [(35,34), (35,35), (35,36)]
+initial = [(35,34), (35,35), (35,36), (36,36)]
 
 def is_alive(y, x, generation):
     """Принимает местоположение клетки(x, y), и список всех генераций
@@ -49,7 +43,6 @@ def calc_neighbours(y, x, generation):
                 alive_neighbours +=1
     return alive_neighbours
         
-
 def is_born(y, x, generation):
     """Принимает местоположение клетки(x, y), и список всех генераций
     Выводит жива она или нет"""
@@ -69,10 +62,7 @@ def find_new_life(y,x, generation):
         for j in range(-1, 2):
             if is_born(y+i, x+j, generation):
                 newborn_cells.append((y+i, x+j))
-    print(newborn_cells)
     return newborn_cells
-
-    
 
 def more_than_max(y, x, generation):
     """
@@ -103,24 +93,22 @@ def calc_generation(generation):
     """
     new_generation = []
     for (y, x) in generation:
-        non = calc_neighbours(y,x,generation)
-        if non >= 2 and non <= 3:
-            more_than_max(y, x, generation)
-            new_generation.append((y,x))
-            print(list(new_generation))
-            new_generation.append(find_new_life(y, x, generation))
-            print(list(new_generation))
+        non = calc_neighbours(x, y, generation)
         
+        if non >= 2 and non <= 3:
+            new_generation.append((x, y))
+
+        new_generation.extend(find_new_life(x, y, generation))        
     
-    return new_generation
+    return list(set(new_generation))
 
 def check(spisok: list):
     """
     Принимает список поколений с дубликатами/без дубликатов
     Выводит есть ли там дубликаты, или нет
-    >>> check([(3, 2), (3, 2)])
+    #>>> check([(3, 2), (3, 2)])
     False
-    >>> check([(3, 2), (3, 3)])
+    #>>> check([(3, 2), (3, 3)])
     True
     """
     spisok = spisok.reverse
@@ -129,34 +117,6 @@ def check(spisok: list):
         return False
     else:
         return True
-def field(generation):
-    """Принимает список всех генераций
-    Создаёт поле для игры"""
-    t = tkinter.Tk()
-    c = tkinter.Canvas(t,height = COORD_MAX_Y,width = COORD_MAX_X)
-    c.pack()
-    generation = list(generation)
-    for i in range(0, COORD_MAX_Y, SIZE_OF_THE_CELL_Y):
-        c.create_line(i, COORD_MAX_X, i, 0, fill = "grey")
-        c.update()
-        c.update_idletasks()
-
-    for i in range(0, COORD_MAX_X, SIZE_OF_THE_CELL_X):
-        c.create_line(COORD_MAX_Y, i, 0,  i, fill = "grey") 
-        c.update()
-        c.update_idletasks()
-
-    for (y, x) in generation:
-        c.create_rectangle(x * SIZE_OF_THE_CELL_X, y * SIZE_OF_THE_CELL_Y,
-          x * SIZE_OF_THE_CELL_X + SIZE_OF_THE_CELL_X, y * SIZE_OF_THE_CELL_Y + SIZE_OF_THE_CELL_Y,  fill = "black")
-        c.update()
-        c.update_idletasks()
-    time.sleep(5)
-    c.clipboard_clear()
-
-    t.mainloop()
-
-
 
 def main():
     """Основная функция"""
@@ -164,12 +124,15 @@ def main():
     state = initial
     generatios.append(tuple(state))
     while len(state) > 0:
+        state = generatios[-1]
         state = calc_generation(state)
-        time.sleep(0.5)
         field(state)
+        time.sleep(0.5)
         generatios.append(tuple(state))
+
+        print(generatios)
         
 
 if __name__ == "__main__":
-    doctest.testmod()
+    # doctest.testmod()
     main()
