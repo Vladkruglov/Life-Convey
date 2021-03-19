@@ -12,22 +12,35 @@ import time
 import doctest
 
 from representation import field
-from constants import COORD_MAX_X, COORD_MAX_Y, SIZE_OF_THE_CELL_X, SIZE_OF_THE_CELL_Y
+from constants import COORD_MAX_X, COORD_MAX_Y, SIZE_OF_THE_CELL_X, SIZE_OF_THE_CELL_Y, NUM_OF_CELLS_IN_A_ROW
 
-initial = [(35,34), (35,35), (35,36), (36,36)]
+initial = [(35,34), (35,35), (35,36), (36,36), (37,35)]
+# initial = [(35,35), (35,36), (36,36)]
 
-def is_alive(y, x, generation):
+def boundaries(a):
+    (x,y) = a
+    if x < 0:
+        x = NUM_OF_CELLS_IN_A_ROW + x +1
+    if y < 0:
+        y = NUM_OF_CELLS_IN_A_ROW + y +1
+    if x > NUM_OF_CELLS_IN_A_ROW:
+        x = x - NUM_OF_CELLS_IN_A_ROW
+    if y > NUM_OF_CELLS_IN_A_ROW:
+        y = y - NUM_OF_CELLS_IN_A_ROW
+
+    return (x, y)
+
+def is_alive(x, y, generation):
     """Принимает местоположение клетки(x, y), и список всех генераций
     Выводит жива она, или нет"""
     try:
-        more_than_max(y, x, generation)
-        generation.index((y, x))
+        generation.index((x, y))
         return True
     except ValueError:
         return False
     return False
 
-def calc_neighbours(y, x, generation):
+def calc_neighbours(x, y, generation):
     """
     Принимает местоположение клетки(x, y), и список всех генераций
     Выводит количество соседей
@@ -37,20 +50,21 @@ def calc_neighbours(y, x, generation):
     alive_neighbours = 0
     for i in range(-1, 2):
         for j in range(-1, 2):
+            (nx, ny) = boundaries((x+i, y+j))
             if i==0 and j==0:
                 continue
-            if is_alive(y+i, x+j, generation):     
+            elif is_alive(nx, ny, generation):
                 alive_neighbours +=1
     return alive_neighbours
         
-def is_born(y, x, generation):
+def is_born(x, y, generation):
     """Принимает местоположение клетки(x, y), и список всех генераций
     Выводит жива она или нет"""
-    neighbours = calc_neighbours(y, x, generation)
+    neighbours = calc_neighbours(x, y, generation)
     if neighbours == 3:
         return True
 
-def find_new_life(y,x, generation):
+def find_new_life(x, y, generation):
     """
     Принимает местоположение клетки(x, y), и список всех генераций
     Выводит список всех новорождённых клеток
@@ -60,78 +74,40 @@ def find_new_life(y,x, generation):
     newborn_cells = []
     for i in range(-1, 2):
         for j in range(-1, 2):
-            if is_born(y+i, x+j, generation):
-                newborn_cells.append((y+i, x+j))
+            (nx, ny) = boundaries((x+i, y+j))
+            if i==0 and j==0:
+                continue
+            elif is_born(nx, ny, generation):
+                newborn_cells.append((x+i, y+j))
     return newborn_cells
 
-def more_than_max(y, x, generation):
-    """
-    Принимает местоположение клетки(x, y), и список всех генераций
-    Проводит местоположение по габаритам
-    Выводит усовершенствованные параметры
-    >>> more_than_max(-1, 701,[(3, 2), (3, 3), (3, 4)])
-    (699, 1)
-    """
-    
-        
-    if x < 0 or y < 0 or x > COORD_MAX_X or y > COORD_MAX_Y:
-        if x < 0:
-            x = COORD_MAX_X + x 
-        if y < 0:
-            y = COORD_MAX_Y + y 
-        if x > COORD_MAX_X:
-            x = x - COORD_MAX_X
-        if y > COORD_MAX_Y:
-            y = y - COORD_MAX_Y
-    return y, x
-
 def calc_generation(generation):
-    """Принимает список всех генераций
-    Выводит новые генерации
+    """Принимает поколение в виде списка кортежей (точек) Выводит новые генерации
+
     >>> calc_generation([(3, 2), (3, 3), (3, 4)])
     [(2, 3), (3, 3), (4, 3)]
+
     """
     new_generation = []
-    for (y, x) in generation:
+    for (x, y) in generation:
         non = calc_neighbours(x, y, generation)
-        
+
         if non >= 2 and non <= 3:
             new_generation.append((x, y))
+        new_generation.extend(find_new_life(x, y, generation))
 
-        new_generation.extend(find_new_life(x, y, generation))        
-    
     return list(set(new_generation))
-
-def check(spisok: list):
-    """
-    Принимает список поколений с дубликатами/без дубликатов
-    Выводит есть ли там дубликаты, или нет
-    #>>> check([(3, 2), (3, 2)])
-    False
-    #>>> check([(3, 2), (3, 3)])
-    True
-    """
-    spisok = spisok.reverse
-    if spisok[0] == spisok[1]:
-        spisok = spisok.reverse
-        return False
-    else:
-        return True
 
 def main():
     """Основная функция"""
-    generatios = []
+    generations = []
     state = initial
-    generatios.append(tuple(state))
+    generations.append(tuple(state))
+    field(state)
     while len(state) > 0:
-        state = generatios[-1]
-        state = calc_generation(state)
+        state = list(map(boundaries, calc_generation(generations[-1])))
         field(state)
-        time.sleep(0.5)
-        generatios.append(tuple(state))
-
-        print(generatios)
-        
+        generations.append(tuple(state))
 
 if __name__ == "__main__":
     # doctest.testmod()
