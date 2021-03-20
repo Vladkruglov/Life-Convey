@@ -1,0 +1,6 @@
+'''Константы для модулей'''
+
+COORD_MAX_X = 700
+COORD_MAX_Y = 700
+NUM_OF_CELLS_IN_A_ROW = 100
+SIZE_OF_THE_CELL = int(COORD_MAX_X / NUM_OF_CELLS_IN_A_ROW)
