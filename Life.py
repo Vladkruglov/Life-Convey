@@ -15,7 +15,8 @@ from representation import field
 from constants import COORD_MAX_X, COORD_MAX_Y, SIZE_OF_THE_CELL, NUM_OF_CELLS_IN_A_ROW
 
 # initial = [(35,34), (35,35), (35,36), (34, 35), (36, 36)] #Pi pentomimo
-initial = [(35,34), (35,35), (35,36), (36,36), (37, 35)] #Glider
+# initial = [(35,34), (35,35), (35,36), (36,36), (37, 35)] #Glider
+initial = [(35,34), (35,35), (35,36), (36,36), (37, 36), (37, 35), (37, 34)] #SpaceFrog
 
 def boundaries(a):
     (x,y) = a
@@ -24,9 +25,9 @@ def boundaries(a):
     if y < 0:
         y = NUM_OF_CELLS_IN_A_ROW + y +1
     if x > NUM_OF_CELLS_IN_A_ROW:
-        x = x - NUM_OF_CELLS_IN_A_ROW
+        x = x - (NUM_OF_CELLS_IN_A_ROW + 1)
     if y > NUM_OF_CELLS_IN_A_ROW:
-        y = y - NUM_OF_CELLS_IN_A_ROW
+        y = y - (NUM_OF_CELLS_IN_A_ROW + 1)
 
     return (x, y)
 
